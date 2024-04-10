@@ -1,6 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { map } from 'rxjs';
+import { HttpService } from '../../services/http.service';
+
 
 @Component({
   selector: 'app-registration',
@@ -10,23 +13,25 @@ import { Router } from '@angular/router';
 export class RegistrationComponent {
 
   itemForm: FormGroup;
-  formModel: any = { role: null, email: '', password: '', name: '', repassword: ''};
+  formModel: any = { role: "user", email: '', password: '', username: '' };
   showMessage: boolean = false;
   confirmPassword: any;
   responseMessage: any;
   responseError: any;
   showError: boolean = false;
-  userModel: any = { role: '', email: '', password: '', name: '' };
+  userModel: any = { role: '', email: '', password: '', username: '' };
+
+  usernameExists = false;
   showPass: boolean = false;
   showRepass: boolean = false;
 
-  constructor(public router: Router,private formBuilder: FormBuilder) {
+  constructor(public router: Router, private httpService: HttpService, private formBuilder: FormBuilder) {
 
     this.itemForm = this.formBuilder.group({
       email: [this.formModel.email, [Validators.required, Validators.email, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$")]],
       password: [this.formModel.password, [Validators.required, Validators.pattern("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[$@$#!%*?&])[A-Za-z\d$@$!%*?&].{7,}$")]],
       role: [this.formModel.role, [Validators.required]],
-      name: [this.formModel.username, [Validators.required]],
+      username: [this.formModel.username, [Validators.required]],
       repassword: [this.formModel.repassword, [Validators.required]],
     },
       {
@@ -37,7 +42,6 @@ export class RegistrationComponent {
 
   ngOnInit(): void {
   }
-
 
   matchPassword(control: AbstractControl): ValidationErrors | null {
     const password = control.get('password');
@@ -70,9 +74,22 @@ export class RegistrationComponent {
 
       this.showMessage = false;
       this.showMessage = false;
+      this.httpService.registerUser(this.userModel).subscribe(data => {
+        debugger;
+        this.showMessage = true;
+        this.responseMessage = 'Welcome ' + data.username + " you are successfully registered";
+        this.itemForm.reset();
+
+      },
+        (error: any) => {
+          this.showError = true;
+          this.responseError = 'An error occurred while registering.';
+        })
     }
     else {
       this.itemForm.markAllAsTouched();
     }
   }
+
+
 }
