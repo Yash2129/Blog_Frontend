@@ -40,10 +40,11 @@ export class LoginComponent implements OnInit {
           this.authService.SetRole(data.role);
           this.authService.SetUsername(data.username);
           this.authService.saveToken(data.token)
-          this.router.navigateByUrl('/dashboard');
-          setTimeout(() => {
-            window.location.reload();
-          }, 1);
+          //this.router.navigateByUrl('/dashboard');
+          console.log(data);
+          // setTimeout(() => {
+          //   window.location.reload();
+          // }, 1);
         } else {
           // Incorrect credentials
           this.showError = true;

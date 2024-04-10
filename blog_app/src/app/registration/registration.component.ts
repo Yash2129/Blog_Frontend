@@ -73,13 +73,10 @@ export class RegistrationComponent {
       this.userModel.password = this.itemForm.value.password;
 
       this.showMessage = false;
-      this.showMessage = false;
       this.httpService.registerUser(this.userModel).subscribe(data => {
-        debugger;
         this.showMessage = true;
-        this.responseMessage = 'Welcome ' + data.username + " you are successfully registered";
+        this.responseMessage = "Registration Succesfull";
         this.itemForm.reset();
-
       },
         (error: any) => {
           this.showError = true;
