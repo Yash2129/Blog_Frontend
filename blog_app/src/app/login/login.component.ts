@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { HttpService } from '../../services/http.service';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -16,9 +15,9 @@ export class LoginComponent implements OnInit {
   errorMessage: any;
   show: boolean = false;
 
-  constructor(public router: Router, public httpService: HttpService, private formBuilder: FormBuilder, private authService: AuthService) {
+  constructor(public router: Router, private formBuilder: FormBuilder, private authService: AuthService) {
     this.itemForm = this.formBuilder.group({
-      username: [this.formModel.username, [Validators.required]],
+      email: [this.formModel.email, [Validators.required, Validators.email, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$")]],
       password: [this.formModel.password, [Validators.required]],
     });
   }
@@ -31,44 +30,22 @@ export class LoginComponent implements OnInit {
     password?.setAttribute('type', type);
   }
 
-  onLogin() {
+  onLogin(){
     if (this.itemForm.valid) {
       this.showError = false;
-      this.httpService.Login(this.itemForm.value).subscribe((data: any) => {
-        if (data.userNo != 0) {
-          // Successful login
-          this.authService.SetRole(data.role);
-          this.authService.SetUsername(data.username);
-          this.authService.saveToken(data.token)
-          this.router.navigateByUrl('/dashboard');
-          
-          setTimeout(() => {
-            window.location.reload();
-          }, 1);
-        } else {
-          // Incorrect credentials
-          this.showError = true;
-          this.errorMessage = "Wrong User or Password";
-        }
-      }, error => {
-        // Handle error
-        this.showError = true;
-        if (error) {
-          // Handle custom exception
-          this.errorMessage = error;
-        } else {
-          // Default error message
-          this.errorMessage = "An error occurred while logging in. Please try again later.";
-        }
-
-      });
+      this.authService.login(this.itemForm.value.email,this.itemForm.value.password);
+      this.itemForm.reset();
     } else {
       // Form validation failed
       this.itemForm.markAllAsTouched();
     }
   }
-
+ 
   registration() {
     this.router.navigateByUrl('/registration');
+  }
+
+  signInWithGoogle() {
+    this.authService.googleSignIn();
   }
 }

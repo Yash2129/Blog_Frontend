@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { map } from 'rxjs';
-import { HttpService } from '../../services/http.service';
+import { AuthService } from 'src/services/auth.service';
+
 
 
 @Component({
@@ -13,25 +13,22 @@ import { HttpService } from '../../services/http.service';
 export class RegistrationComponent {
 
   itemForm: FormGroup;
-  formModel: any = { role: "user", email: '', password: '', username: '' };
+  formModel: any = { email: '', password: '', username: '' };
   showMessage: boolean = false;
   confirmPassword: any;
   responseMessage: any;
   responseError: any;
   showError: boolean = false;
-  userModel: any = { role: '', email: '', password: '', username: '' };
-
   usernameExists = false;
   showPass: boolean = false;
   showRepass: boolean = false;
 
-  constructor(public router: Router, private httpService: HttpService, private formBuilder: FormBuilder) {
+  constructor(public router: Router, private formBuilder: FormBuilder,private authService: AuthService) {
 
     this.itemForm = this.formBuilder.group({
+      username: [this.formModel.username, [Validators.required]],
       email: [this.formModel.email, [Validators.required, Validators.email, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$")]],
       password: [this.formModel.password, [Validators.required, Validators.pattern("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[$@$#!%*?&])[A-Za-z\d$@$!%*?&].{7,}$")]],
-      role: [this.formModel.role, [Validators.required]],
-      username: [this.formModel.username, [Validators.required]],
       repassword: [this.formModel.repassword, [Validators.required]],
     },
       {
@@ -65,28 +62,17 @@ export class RegistrationComponent {
     repassword?.setAttribute('type', type);
   }
 
-  onRegister() {
-    if (this.itemForm.valid) {
-      this.userModel.role = this.itemForm.value.role;
-      this.userModel.email = this.itemForm.value.email;
-      this.userModel.username = this.itemForm.value.username;
-      this.userModel.password = this.itemForm.value.password;
+  
 
-      this.showMessage = false;
-      this.httpService.registerUser(this.userModel).subscribe(data => {
-        this.showMessage = true;
-        this.responseMessage = "Registration Succesfull";
-        this.itemForm.reset();
-      },
-        (error: any) => {
-          this.showError = true;
-          this.responseError = 'An error occurred while registering.';
-        })
-    }
-    else {
+  onRegister(){
+    if (this.itemForm.valid) {
+      this.showError = false;
+      this.authService.register(this.itemForm.value.email,this.itemForm.value.password);
+      this.itemForm.reset();
+    } else {
+      // Form validation failed
       this.itemForm.markAllAsTouched();
     }
   }
-
 
 }
