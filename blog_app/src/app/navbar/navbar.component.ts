@@ -10,11 +10,16 @@ import { AuthService } from 'src/services/auth.service';
 export class NavbarComponent {
 
   // Variable to store the role name of the logged-in user
-
+  isLoggedin: boolean;
   constructor(private authService: AuthService, private router: Router) {
     // Initialize IsLoggin and roleName properties with AuthService
     // If the user is not logged in, redirect to the homepage
-    
+    if(localStorage.getItem('token') != null){
+      this.isLoggedin = true
+    }
+    else{
+      this.isLoggedin = false;
+    }
   }
 
   // Method to handle user logout

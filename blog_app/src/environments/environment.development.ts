@@ -7,4 +7,5 @@ export const environment = {
     messagingSenderId: '657679198585',
     appId: '1:657679198585:web:84520b236244588585a7a8',
   },
+  apiUrl : "https://jsonplaceholder.typicode.com",
 };

@@ -24,6 +24,10 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void { }
 
+  onload(){
+    window.location.reload()
+  }
+
   toggle() {
     const password = document.getElementById('password');
     const type = password?.getAttribute('type') === 'password' ? 'text' : 'password';
@@ -35,6 +39,7 @@ export class LoginComponent implements OnInit {
       this.showError = false;
       this.authService.login(this.itemForm.value.email,this.itemForm.value.password);
       this.itemForm.reset();
+      
     } else {
       // Form validation failed
       this.itemForm.markAllAsTouched();
